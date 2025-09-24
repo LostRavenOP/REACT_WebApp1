@@ -18,9 +18,9 @@ function AnimeCard({anime}) {
                 </div>
                 <div className="anime-info">
                     <h2 className="anime-title">{anime.title}</h2>
-                    {/* <p className="anime-synopsis">{anime.synopsis}</p>
-                    <p className="anime-score">Score: {anime.score}</p> */}
-                    {/* <a href={anime.url} target="_blank" rel="noopener noreferrer" className="anime-link">More Info</a> */}
+                    <p className="anime-synopsis">{anime.synopsis}</p>
+                    <p className="anime-score">Score: {anime.score}</p>
+                    <a href={anime.url} target="_blank" rel="noopener noreferrer" className="anime-link">More Info</a>
                 </div>
             </div>
         </>
