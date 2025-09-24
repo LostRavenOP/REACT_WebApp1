@@ -1,4 +1,4 @@
-
+import '../css/AnimeCard.css'
 
 function AnimeCard({anime}) {
 

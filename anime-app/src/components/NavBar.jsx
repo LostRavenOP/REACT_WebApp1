@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
+import "../css/NavBar.css"
 
 function NavBar() {
     return (
-        <nav className="nav-bar">
+        <nav className="navbar">
             <div className="navbar-Brand">
                 <Link to="/" className="nav-logo">AnimeApp</Link>
             </div>
