@@ -1,39 +1,100 @@
 import AnimeCard from "../components/AnimeCard";
-import { useState } from "react"
-import '../css/Home.css'
+import { useState, useEffect } from "react";
+import "../css/Home.css";
+import { fetchPokemon, fetchPokemonList } from "../services/api";
 
 function Home() {
-
     const [searchTerm, setSearchTerm] = useState("");
+    const [animes, setAnimes] = useState([]); // store Pokémon list for display
+    const [allPokemon, setAllPokemon] = useState([]); // store all names
+    const [pokemonCache, setPokemonCache] = useState({}); // cache of { name: details }
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const animes = [
-        {title: "Naruto", image_url: "https://cdn.myanimelist.net/images/anime/13/17405.jpg", synopsis: "A story about a ninja", score: 8.3, url: "https://myanimelist.net/anime/20/Naruto"},
-        {title: "One Piece", image_url: "https://cdn.myanimelist.net/images/anime/6/73245.jpg", synopsis: "A story about pirates", score: 9.0, url: "https://myanimelist.net/anime/21/One_Piece"},
-        {title: "Attack on Titan", image_url: "https://cdn.myanimelist.net/images/anime/10/47347.jpg", synopsis: "A story about humans vs titans", score: 9.1, url: "https://myanimelist.net/anime/16498/Shingeki_no_Kyojin"},
-    ];
+    // Load first 151 Pokémon on mount
+    useEffect(() => {
+        async function loadInitialPokemon() {
+        setLoading(true);
+        const list = await fetchPokemonList(151, 0);
+        setAllPokemon(list);
 
-    const handleSearch = (e) => {
+        // Fetch details only once
+        const details = await Promise.all(
+            list.map(async (p) => {
+            if (pokemonCache[p.name]) return pokemonCache[p.name];
+            const data = await fetchPokemon(p.name);
+            return data;
+            })
+        );
+
+        // Build cache
+        const newCache = {};
+        details.forEach((d) => {
+            if (d) newCache[d.name] = d;
+        });
+        setPokemonCache(newCache);
+
+        setAnimes(details.filter(Boolean));
+        setLoading(false);
+        }
+        loadInitialPokemon();
+    }, []);
+
+    const handleSearch = async (e) => {
         e.preventDefault();
-        alert(`Searching for: ${searchTerm}`);
-    }
+        setError("");
+
+        if (!searchTerm) {
+        setAnimes(Object.values(pokemonCache)); // show all cached
+        return;
+        }
+
+        const matches = allPokemon.filter((p) =>
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        if (matches.length === 0) {
+        setError("No matches found.");
+        return;
+        }
+
+        const details = await Promise.all(
+        matches.map(async (p) => {
+            if (pokemonCache[p.name]) return pokemonCache[p.name];
+            const data = await fetchPokemon(p.name);
+            setPokemonCache((prev) => ({ ...prev, [p.name]: data }));
+            return data;
+        })
+        );
+
+        setAnimes(details.filter(Boolean));
+    };
 
     return (
         <div className="home">
+        <h1>AniQuest</h1>
 
+        <form className="search-form" onSubmit={handleSearch}>
+            <input
+            type="text"
+            placeholder="Search for an anime..."
+            className="search-input"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button type="submit" className="search-button">Search</button>
+        </form>
 
-            <h1>AniQuest</h1>
-            <form className="search-form" onSubmit={handleSearch}>
-                <input type="text" placeholder="Search for an anime..." className="search-input" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
-                <button type="submit" className="search-button">Search</button>
-            </form>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        {loading && <p>Loading Pokémon...</p>}
 
-            <div className="anime-list">
-                {animes.map((anime, index) => (
-                    <AnimeCard key={index} anime={anime} />
-                ))}
-            </div>
+        <div className="anime-list">
+            {animes.map((anime, index) => (
+            <AnimeCard key={index} anime={anime} />
+            ))}
         </div>
-    )
+        </div>
+    );
 }
 
-export default Home
+export default Home;
