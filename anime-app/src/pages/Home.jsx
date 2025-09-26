@@ -2,6 +2,7 @@ import AnimeCard from "../components/AnimeCard";
 import { useState, useEffect } from "react";
 import "../css/Home.css";
 import { fetchPokemon, fetchPokemonList } from "../services/api";
+import PokemonModal from "../components/PokemonModal";
 
 function Home() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -10,6 +11,8 @@ function Home() {
     const [pokemonCache, setPokemonCache] = useState({}); // cache of { name: details }
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [selectedPokemon, setSelectedPokemon] = useState(null); // NEW
+    const [isModalOpen, setIsModalOpen] = useState(false); // NEW
 
     // Load first 151 Pokémon on mount
     useEffect(() => {
@@ -70,6 +73,16 @@ function Home() {
         setAnimes(details.filter(Boolean));
     };
 
+    const openModal = (pokemon) => {
+        setSelectedPokemon(pokemon);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setSelectedPokemon(null);
+        setIsModalOpen(false);
+    };
+
     return (
         <div className="home">
         <h1>AniQuest</h1>
@@ -90,9 +103,15 @@ function Home() {
 
         <div className="anime-list">
             {animes.map((anime, index) => (
-            <AnimeCard key={index} anime={anime} />
+            <AnimeCard key={index} anime={anime} onClick={() => openModal(anime)}/>
             ))}
         </div>
+        {isModalOpen && (
+        <PokemonModal 
+        pokemon={selectedPokemon} 
+        onClose={closeModal} 
+        />
+        )}
         </div>
     );
 }

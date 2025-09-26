@@ -1,6 +1,6 @@
 import '../css/AnimeCard.css'
 
-function AnimeCard({anime}) {
+function AnimeCard({anime, onClick}) {
 
     function onWatchListClick() {
         alert(`Favourite clicked for anime: ${anime.name}`);
@@ -18,42 +18,42 @@ function AnimeCard({anime}) {
 
     return (
         <>
-            <div className="anime-card">
-        <div className="anime-poster">
-          <img
-            src={anime.sprites?.front_default}  // Pokémon sprite instead of anime poster
-            alt={anime.name}
-            className="anime-image"
-          />
-          <div className="anime-overlay">
-            <button className="watchList-btn" onClick={onWatchListClick}>
-              ➕
-            </button>
-          </div>
-        </div>
+            <div className="anime-card" >
+                <div className="anime-poster">
+                <img
+                    src={anime.sprites?.front_default}  // Pokémon sprite instead of anime poster
+                    alt={anime.name}
+                    className="anime-image"
+                />
+                <div className="anime-overlay">
+                    <button className="watchList-btn" onClick={onWatchListClick}>
+                    ➕
+                    </button>
+                </div>
+                </div>
 
-        <div className="anime-info">
-          <h2 className="anime-title">{toTitleCase(anime.name)}</h2>
+                <div className="anime-info">
+                <h2 className="anime-title">{toTitleCase(anime.name)}</h2>
 
-          {/* No synopsis in PokéAPI, so we'll fake one with stats */}
-          <p className="anime-synopsis">
-            Height: {anime.height}, Weight: {anime.weight}
-          </p>
+                {/* No synopsis in PokéAPI, so we'll fake one with stats */}
+                <p className="anime-synopsis">
+                    Height: {anime.height}, Weight: {anime.weight}
+                </p>
 
-          {/* Pokémon don’t have "score", so let’s show base experience */}
-          <p className="anime-score">Base XP: {anime.base_experience}</p>
+                {/* Pokémon don’t have "score", so let’s show base experience */}
+                <p className="anime-score">Base XP: {anime.base_experience}</p>
 
-          {/* Link back to Pokédex entry URL */}
-          <a
-            href={`https://pokeapi.co/api/v2/pokemon/${anime.name}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="anime-link"
-          >
-            More Info
-          </a>
-        </div>
-      </div>
+                {/* Link back to Pokédex entry URL */}
+                <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="anime-link"
+                    onClick={onClick}
+                >
+                    More Info
+                </a>
+                </div>
+            </div>
         </>
     )
 }
